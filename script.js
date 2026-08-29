@@ -2,7 +2,14 @@
 let isPlaying = false;
 let volume = 1;
 const audioPlayer = document.getElementById('audio-player');
-const streamUrl = 'https://stream.zeno.fm/gy7q6vnw25zuv';
+
+// Streaming URLs - Multiple options for reliability
+const streamUrls = [
+    'https://stream.zeno.fm/gy7q6vnw25zuv.m3u8',  // HLS format
+    'https://stream.zeno.fm/gy7q6vnw25zuv'        // Direct MP3
+];
+
+let currentStreamIndex = 0;
 
 // Toggle play/pause
 function togglePlay() {
@@ -16,27 +23,66 @@ function togglePlay() {
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
         streamStatus.textContent = 'Lecture en pause';
         streamStatus.style.color = '#666';
+        
+        // Stop visualizer
+        const visualizerBars = document.querySelectorAll('.bar');
+        visualizerBars.forEach(bar => {
+            bar.style.animationPlayState = 'paused';
+        });
     } else {
         // Start playing
-        try {
-            // Set the source and play
-            audioPlayer.src = streamUrl;
-            audioPlayer.play();
-            isPlaying = true;
-            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            streamStatus.textContent = '🔴 EN DIRECT - Diffusion en cours';
-            streamStatus.style.color = '#ff4444';
-            
-            // Start visualizer animation
-            const visualizerBars = document.querySelectorAll('.bar');
-            visualizerBars.forEach(bar => {
-                bar.style.animationPlayState = 'running';
+        streamStatus.textContent = '⏳ Chargement du flux audio...';
+        streamStatus.style.color = '#0066ff';
+        playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        currentStreamIndex = 0;
+        
+        playNextStream();
+    }
+}
+
+function playNextStream() {
+    if (currentStreamIndex >= streamUrls.length) {
+        const streamStatus = document.getElementById('stream-status');
+        streamStatus.textContent = '❌ Impossible de se connecter. Vérifiez votre connexion Internet.';
+        streamStatus.style.color = '#ff4444';
+        document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+        isPlaying = false;
+        return;
+    }
+
+    const streamUrl = streamUrls[currentStreamIndex];
+    console.log('Tentative de connexion à: ' + streamUrl);
+    
+    audioPlayer.src = streamUrl;
+    audioPlayer.crossOrigin = 'anonymous';
+    
+    const playPromise = audioPlayer.play();
+    
+    if (playPromise !== undefined) {
+        playPromise
+            .then(() => {
+                console.log('Lecture commencée');
+                isPlaying = true;
+                const playBtn = document.getElementById('play-btn');
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                
+                const streamStatus = document.getElementById('stream-status');
+                streamStatus.textContent = '🔴 EN DIRECT - Diffusion en cours';
+                streamStatus.style.color = '#ff4444';
+                
+                // Start visualizer
+                const visualizerBars = document.querySelectorAll('.bar');
+                visualizerBars.forEach(bar => {
+                    bar.style.animationPlayState = 'running';
+                });
+                
+                currentStreamIndex = 0;
+            })
+            .catch(error => {
+                console.error('Erreur avec le flux: ' + error.message);
+                currentStreamIndex++;
+                setTimeout(playNextStream, 1000);
             });
-        } catch (error) {
-            console.error('Erreur lors de la lecture:', error);
-            streamStatus.textContent = 'Tentative de connexion...';
-            streamStatus.style.color = '#666';
-        }
     }
 }
 
@@ -66,30 +112,38 @@ function updateListenerCount() {
 // Audio player event listeners
 audioPlayer.addEventListener('play', () => {
     console.log('Audio started playing');
-    const visualizerBars = document.querySelectorAll('.bar');
-    visualizerBars.forEach(bar => {
-        bar.style.animationPlayState = 'running';
-    });
+    isPlaying = true;
 });
 
 audioPlayer.addEventListener('pause', () => {
     console.log('Audio paused');
-    const visualizerBars = document.querySelectorAll('.bar');
-    visualizerBars.forEach(bar => {
-        bar.style.animationPlayState = 'paused';
-    });
 });
 
 audioPlayer.addEventListener('error', (e) => {
-    console.error('Erreur de lecture:', e);
+    console.error('Erreur audio:', e);
     const streamStatus = document.getElementById('stream-status');
-    streamStatus.textContent = 'Erreur de connexion. Vérifiez votre connexion Internet.';
-    streamStatus.style.color = '#ff4444';
-    document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
-    isPlaying = false;
+    
+    currentStreamIndex++;
+    if (currentStreamIndex < streamUrls.length) {
+        streamStatus.textContent = '⏳ Tentative ' + (currentStreamIndex + 1) + '...';
+        streamStatus.style.color = '#0066ff';
+        setTimeout(playNextStream, 500);
+    } else {
+        streamStatus.textContent = '❌ Erreur de connexion au flux audio';
+        streamStatus.style.color = '#ff4444';
+        document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+        isPlaying = false;
+    }
+});
+
+audioPlayer.addEventListener('stalled', () => {
+    const streamStatus = document.getElementById('stream-status');
+    streamStatus.textContent = '⏳ Chargement du flux...';
+    streamStatus.style.color = '#0066ff';
 });
 
 audioPlayer.addEventListener('canplay', () => {
+    console.log('Flux audio prêt');
     const streamStatus = document.getElementById('stream-status');
     if (isPlaying) {
         streamStatus.textContent = '🔴 EN DIRECT - Diffusion en cours';
@@ -97,17 +151,10 @@ audioPlayer.addEventListener('canplay', () => {
     }
 });
 
-audioPlayer.addEventListener('stalled', () => {
-    const streamStatus = document.getElementById('stream-status');
-    streamStatus.textContent = 'Chargement du flux...';
-    streamStatus.style.color = '#0066ff';
-});
-
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     // Set initial volume
     audioPlayer.volume = 1;
-    audioPlayer.crossOrigin = 'anonymous';
 
     // Mobile menu
     const hamburger = document.querySelector('.hamburger');
@@ -181,6 +228,19 @@ style.textContent = `
             opacity: 1;
             transform: translateY(0);
         }
+    }
+    
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    .fa-spin {
+        animation: spin 1s linear infinite;
     }
 `;
 document.head.appendChild(style);
