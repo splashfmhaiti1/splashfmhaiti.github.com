@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splash FM Haiti - Station de Radio Moderne</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-water"></i>
+                <span>Splash FM</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Accueil</a></li>
+                <li><a href="#player">Écouter</a></li>
+                <li><a href="#schedule">Horaire</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <img src="https://via.placeholder.com/400x300/0066ff/ffffff?text=Splash+FM+Haiti" alt="Splash FM Haiti Logo" class="hero-logo">
+            <h1>Splash FM Haiti</h1>
+            <p>La Station de Radio Moderne d'Haïti</p>
+            <button class="cta-button" onclick="document.getElementById('player').scrollIntoView({behavior: 'smooth'})">
+                <i class="fas fa-play"></i> Écouter Maintenant
+            </button>
+        </div>
+        <div class="hero-background"></div>
+    </section>
+
+    <!-- Player Section -->
+    <section id="player" class="player-section">
+        <div class="container">
+            <h2>Lecteur Radio En Direct</h2>
+            <div class="player-card">
+                <div class="player-display">
+                    <div class="now-playing">
+                        <h3 id="current-song">Musique Classique</h3>
+                        <p id="current-artist">Artiste Inconnu</p>
+                    </div>
+                    <div class="visualizer">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                </div>
+                <div class="player-controls">
+                    <button id="play-btn" class="control-btn" onclick="togglePlay()">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <button class="control-btn" onclick="toggleVolume()">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+                <p class="stream-status" id="stream-status">Cliquez sur Play pour écouter</p>
+            </div>
+
+            <!-- Live Stats -->
+            <div class="stats">
+                <div class="stat">
+                    <i class="fas fa-headphones"></i>
+                    <h3 id="listener-count">2,547</h3>
+                    <p>Auditeurs en direct</p>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <h3>128 kbps</h3>
+                    <p>Qualité du flux</p>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-globe"></i>
+                    <h3>24/7</h3>
+                    <p>Diffusion continue</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section id="schedule" class="schedule-section">
+        <div class="container">
+            <h2>Horaire de Programmation</h2>
+            <div class="schedule-grid">
+                <div class="schedule-item">
+                    <div class="time">06:00 - 09:00</div>
+                    <h3>Bonjour Haïti</h3>
+                    <p>Musique énergique et actualités du matin</p>
+                </div>
+                <div class="schedule-item">
+                    <div class="time">09:00 - 12:00</div>
+                    <h3>Hits du Jour</h3>
+                    <p>Les plus grands succès musicaux</p>
+                </div>
+                <div class="schedule-item">
+                    <div class="time">12:00 - 15:00</div>
+                    <h3>Midi Tropical</h3>
+                    <p>Musique traditionnelle haïtienne</p>
+                </div>
+                <div class="schedule-item">
+                    <div class="time">15:00 - 18:00</div>
+                    <h3>Afters School Mix</h3>
+                    <p>Pop, hip-hop et musique urbaine</p>
+                </div>
+                <div class="schedule-item">
+                    <div class="time">18:00 - 21:00</div>
+                    <h3>Soirée Détente</h3>
+                    <p>Jazz, soul et musique relaxante</p>
+                </div>
+                <div class="schedule-item">
+                    <div class="time">21:00 - 06:00</div>
+                    <h3>Nuit Musicale</h3>
+                    <p>Meilleurs succès internationaux</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Media Section -->
+    <section class="social-section">
+        <div class="container">
+            <h2>Suivez-Nous</h2>
+            <div class="social-links">
+                <a href="https://facebook.com/splashfmhaiti" target="_blank" class="social-btn facebook">
+                    <i class="fab fa-facebook"></i>
+                    <span>Facebook</span>
+                </a>
+                <a href="https://twitter.com/splashfmhaiti" target="_blank" class="social-btn twitter">
+                    <i class="fab fa-twitter"></i>
+                    <span>Twitter</span>
+                </a>
+                <a href="https://instagram.com/splashfmhaiti" target="_blank" class="social-btn instagram">
+                    <i class="fab fa-instagram"></i>
+                    <span>Instagram</span>
+                </a>
+                <a href="https://youtube.com/splashfmhaiti" target="_blank" class="social-btn youtube">
+                    <i class="fab fa-youtube"></i>
+                    <span>YouTube</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2>Nous Contacter</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Téléphone</h3>
+                            <p>+509 XXXX-XXXX</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email</h3>
+                            <p>info@splashfmhaiti.com</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>Localisation</h3>
+                            <p>Port-au-Prince, Haïti</p>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form" onsubmit="submitForm(event)">
+                    <input type="text" placeholder="Votre nom" required>
+                    <input type="email" placeholder="Votre email" required>
+                    <textarea placeholder="Votre message" rows="5" required></textarea>
+                    <button type="submit" class="submit-btn">Envoyer</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Splash FM Haiti. Tous droits réservés.</p>
+            <div class="footer-links">
+                <a href="#">Politique de Confidentialité</a>
+                <a href="#">Conditions d'Utilisation</a>
+                <a href="#">À Propos</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
