@@ -1,85 +1,41 @@
-// Player functionality
+// Audio Player functionality
 let isPlaying = false;
-let currentTime = 0;
-let duration = 180; // 3 minutes simulation
 let volume = 1;
-
-// Sample playlist
-const playlist = [
-    { song: "Tropical Vibes", artist: "Haitian Beats" },
-    { song: "Caribbean Dreams", artist: "Island Groove" },
-    { song: "Port-au-Prince Nights", artist: "Urban Sounds" },
-    { song: "Rhythms of Haiti", artist: "Local Artists" }
-];
-
-let currentTrackIndex = 0;
+const audioPlayer = document.getElementById('audio-player');
 
 // Toggle play/pause
 function togglePlay() {
     const playBtn = document.getElementById('play-btn');
     const streamStatus = document.getElementById('stream-status');
     
-    isPlaying = !isPlaying;
-    
     if (isPlaying) {
-        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        streamStatus.textContent = '🔴 EN DIRECT - Diffusion en cours';
-        streamStatus.style.color = '#ff4444';
-        startPlayback();
-    } else {
+        // Stop playing
+        audioPlayer.pause();
+        isPlaying = false;
         playBtn.innerHTML = '<i class="fas fa-play"></i>';
         streamStatus.textContent = 'Lecture en pause';
         streamStatus.style.color = '#666';
-        stopPlayback();
+    } else {
+        // Start playing
+        audioPlayer.play();
+        isPlaying = true;
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        streamStatus.textContent = '🔴 EN DIRECT - Diffusion en cours';
+        streamStatus.style.color = '#ff4444';
     }
-}
-
-function startPlayback() {
-    const progressBar = document.getElementById('progress');
-    const playInterval = setInterval(() => {
-        if (!isPlaying) {
-            clearInterval(playInterval);
-            return;
-        }
-        
-        currentTime += 0.5;
-        if (currentTime > duration) {
-            currentTime = 0;
-            switchTrack();
-        }
-        
-        const percentage = (currentTime / duration) * 100;
-        progressBar.style.width = percentage + '%';
-    }, 500);
-}
-
-function stopPlayback() {
-    const progressBar = document.getElementById('progress');
-    progressBar.style.width = '0%';
-    currentTime = 0;
-}
-
-// Switch to next track
-function switchTrack() {
-    currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
-    updateNowPlaying();
-}
-
-// Update now playing display
-function updateNowPlaying() {
-    const track = playlist[currentTrackIndex];
-    document.getElementById('current-song').textContent = track.song;
-    document.getElementById('current-artist').textContent = track.artist;
 }
 
 // Toggle volume
 function toggleVolume() {
     const volumeBtn = document.querySelector('.control-btn:last-child');
+    
     if (volume > 0) {
         volume = 0;
+        audioPlayer.volume = 0;
         volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
     } else {
         volume = 1;
+        audioPlayer.volume = 1;
         volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
     }
 }
@@ -92,19 +48,36 @@ function updateListenerCount() {
     document.getElementById('listener-count').textContent = randomListeners.toLocaleString();
 }
 
-// Progress bar click
+// Audio player event listeners
+audioPlayer.addEventListener('play', () => {
+    console.log('Audio started playing');
+    const visualizerBars = document.querySelectorAll('.bar');
+    visualizerBars.forEach(bar => {
+        bar.style.animationPlayState = 'running';
+    });
+});
+
+audioPlayer.addEventListener('pause', () => {
+    console.log('Audio paused');
+    const visualizerBars = document.querySelectorAll('.bar');
+    visualizerBars.forEach(bar => {
+        bar.style.animationPlayState = 'paused';
+    });
+});
+
+audioPlayer.addEventListener('error', (e) => {
+    console.error('Erreur de lecture:', e);
+    const streamStatus = document.getElementById('stream-status');
+    streamStatus.textContent = 'Erreur de connexion. Veuillez réessayer.';
+    streamStatus.style.color = '#ff4444';
+    document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
+    isPlaying = false;
+});
+
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    const progressBar = document.querySelector('.progress-bar');
-    if (progressBar) {
-        progressBar.addEventListener('click', (e) => {
-            if (isPlaying) {
-                const rect = progressBar.getBoundingClientRect();
-                const percent = (e.clientX - rect.left) / rect.width;
-                currentTime = percent * duration;
-                document.getElementById('progress').style.width = (percent * 100) + '%';
-            }
-        });
-    }
+    // Set initial volume
+    audioPlayer.volume = 1;
 
     // Mobile menu
     const hamburger = document.querySelector('.hamburger');
@@ -120,9 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateListenerCount();
     setInterval(updateListenerCount, 5000);
 
-    // Initialize now playing
-    updateNowPlaying();
-
     // Smooth scroll for mobile
     const navLinks = document.querySelectorAll('.nav-menu a');
     navLinks.forEach(link => {
@@ -136,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function submitForm(event) {
     event.preventDefault();
     const form = event.target;
-    const formData = new FormData(form);
     
     // Simulate form submission
     console.log('Message envoyé:', {
