@@ -2,6 +2,7 @@
 let isPlaying = false;
 let volume = 1;
 const audioPlayer = document.getElementById('audio-player');
+const streamUrl = 'https://stream.zeno.fm/gy7q6vnw25zuv';
 
 // Toggle play/pause
 function togglePlay() {
@@ -17,11 +18,25 @@ function togglePlay() {
         streamStatus.style.color = '#666';
     } else {
         // Start playing
-        audioPlayer.play();
-        isPlaying = true;
-        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        streamStatus.textContent = '🔴 EN DIRECT - Diffusion en cours';
-        streamStatus.style.color = '#ff4444';
+        try {
+            // Set the source and play
+            audioPlayer.src = streamUrl;
+            audioPlayer.play();
+            isPlaying = true;
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            streamStatus.textContent = '🔴 EN DIRECT - Diffusion en cours';
+            streamStatus.style.color = '#ff4444';
+            
+            // Start visualizer animation
+            const visualizerBars = document.querySelectorAll('.bar');
+            visualizerBars.forEach(bar => {
+                bar.style.animationPlayState = 'running';
+            });
+        } catch (error) {
+            console.error('Erreur lors de la lecture:', error);
+            streamStatus.textContent = 'Tentative de connexion...';
+            streamStatus.style.color = '#666';
+        }
     }
 }
 
@@ -68,16 +83,31 @@ audioPlayer.addEventListener('pause', () => {
 audioPlayer.addEventListener('error', (e) => {
     console.error('Erreur de lecture:', e);
     const streamStatus = document.getElementById('stream-status');
-    streamStatus.textContent = 'Erreur de connexion. Veuillez réessayer.';
+    streamStatus.textContent = 'Erreur de connexion. Vérifiez votre connexion Internet.';
     streamStatus.style.color = '#ff4444';
     document.getElementById('play-btn').innerHTML = '<i class="fas fa-play"></i>';
     isPlaying = false;
+});
+
+audioPlayer.addEventListener('canplay', () => {
+    const streamStatus = document.getElementById('stream-status');
+    if (isPlaying) {
+        streamStatus.textContent = '🔴 EN DIRECT - Diffusion en cours';
+        streamStatus.style.color = '#ff4444';
+    }
+});
+
+audioPlayer.addEventListener('stalled', () => {
+    const streamStatus = document.getElementById('stream-status');
+    streamStatus.textContent = 'Chargement du flux...';
+    streamStatus.style.color = '#0066ff';
 });
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     // Set initial volume
     audioPlayer.volume = 1;
+    audioPlayer.crossOrigin = 'anonymous';
 
     // Mobile menu
     const hamburger = document.querySelector('.hamburger');
